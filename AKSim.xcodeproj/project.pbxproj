@@ -1,0 +1,211 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		04724A0415D364DE00E769A7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04724A0315D364DE00E769A7 /* main.cpp */; };
+		04724A0615D364DE00E769A7 /* AKSim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04724A0515D364DE00E769A7 /* AKSim.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		047249FD15D364DE00E769A7 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				04724A0615D364DE00E769A7 /* AKSim.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		047249FF15D364DE00E769A7 /* AKSim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AKSim; sourceTree = BUILT_PRODUCTS_DIR; };
+		04724A0315D364DE00E769A7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		04724A0515D364DE00E769A7 /* AKSim.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = AKSim.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		047249FC15D364DE00E769A7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		047249F415D364DE00E769A7 = {
+			isa = PBXGroup;
+			children = (
+				04724A0215D364DE00E769A7 /* AKSim */,
+				04724A0015D364DE00E769A7 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		04724A0015D364DE00E769A7 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				047249FF15D364DE00E769A7 /* AKSim */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		04724A0215D364DE00E769A7 /* AKSim */ = {
+			isa = PBXGroup;
+			children = (
+				04724A0315D364DE00E769A7 /* main.cpp */,
+				04724A0515D364DE00E769A7 /* AKSim.1 */,
+			);
+			path = AKSim;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		047249FE15D364DE00E769A7 /* AKSim */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04724A0915D364DE00E769A7 /* Build configuration list for PBXNativeTarget "AKSim" */;
+			buildPhases = (
+				047249FB15D364DE00E769A7 /* Sources */,
+				047249FC15D364DE00E769A7 /* Frameworks */,
+				047249FD15D364DE00E769A7 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AKSim;
+			productName = AKSim;
+			productReference = 047249FF15D364DE00E769A7 /* AKSim */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		047249F615D364DE00E769A7 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0440;
+				ORGANIZATIONNAME = "Cícero Camargo";
+			};
+			buildConfigurationList = 047249F915D364DE00E769A7 /* Build configuration list for PBXProject "AKSim" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 047249F415D364DE00E769A7;
+			productRefGroup = 04724A0015D364DE00E769A7 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				047249FE15D364DE00E769A7 /* AKSim */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		047249FB15D364DE00E769A7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				04724A0415D364DE00E769A7 /* main.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		04724A0715D364DE00E769A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		04724A0815D364DE00E769A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		04724A0A15D364DE00E769A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		04724A0B15D364DE00E769A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		047249F915D364DE00E769A7 /* Build configuration list for PBXProject "AKSim" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04724A0715D364DE00E769A7 /* Debug */,
+				04724A0815D364DE00E769A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04724A0915D364DE00E769A7 /* Build configuration list for PBXNativeTarget "AKSim" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04724A0A15D364DE00E769A7 /* Debug */,
+				04724A0B15D364DE00E769A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 047249F615D364DE00E769A7 /* Project object */;
+}
