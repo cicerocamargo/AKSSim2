@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		04724A0415D364DE00E769A7 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04724A0315D364DE00E769A7 /* main.cpp */; };
 		04724A0615D364DE00E769A7 /* AKSim.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 04724A0515D364DE00E769A7 /* AKSim.1 */; };
+		04724A1015D3654E00E769A7 /* Processor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04724A0C15D3654E00E769A7 /* Processor.cpp */; };
+		04724A1115D3654E00E769A7 /* Scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04724A0E15D3654E00E769A7 /* Scheduler.cpp */; };
+		04724A1615D3660400E769A7 /* Task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04724A1215D3660400E769A7 /* Task.cpp */; };
+		04724A1715D3660400E769A7 /* Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04724A1415D3660400E769A7 /* Thread.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +32,14 @@
 		047249FF15D364DE00E769A7 /* AKSim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AKSim; sourceTree = BUILT_PRODUCTS_DIR; };
 		04724A0315D364DE00E769A7 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		04724A0515D364DE00E769A7 /* AKSim.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = AKSim.1; sourceTree = "<group>"; };
+		04724A0C15D3654E00E769A7 /* Processor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Processor.cpp; sourceTree = "<group>"; };
+		04724A0D15D3654E00E769A7 /* Processor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Processor.h; sourceTree = "<group>"; };
+		04724A0E15D3654E00E769A7 /* Scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scheduler.cpp; sourceTree = "<group>"; };
+		04724A0F15D3654E00E769A7 /* Scheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scheduler.h; sourceTree = "<group>"; };
+		04724A1215D3660400E769A7 /* Task.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Task.cpp; sourceTree = "<group>"; };
+		04724A1315D3660400E769A7 /* Task.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Task.h; sourceTree = "<group>"; };
+		04724A1415D3660400E769A7 /* Thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Thread.cpp; sourceTree = "<group>"; };
+		04724A1515D3660400E769A7 /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Thread.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +73,14 @@
 			isa = PBXGroup;
 			children = (
 				04724A0315D364DE00E769A7 /* main.cpp */,
+				04724A0C15D3654E00E769A7 /* Processor.cpp */,
+				04724A0D15D3654E00E769A7 /* Processor.h */,
+				04724A0E15D3654E00E769A7 /* Scheduler.cpp */,
+				04724A0F15D3654E00E769A7 /* Scheduler.h */,
+				04724A1215D3660400E769A7 /* Task.cpp */,
+				04724A1315D3660400E769A7 /* Task.h */,
+				04724A1415D3660400E769A7 /* Thread.cpp */,
+				04724A1515D3660400E769A7 /* Thread.h */,
 				04724A0515D364DE00E769A7 /* AKSim.1 */,
 			);
 			path = AKSim;
@@ -118,6 +138,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				04724A0415D364DE00E769A7 /* main.cpp in Sources */,
+				04724A1015D3654E00E769A7 /* Processor.cpp in Sources */,
+				04724A1115D3654E00E769A7 /* Scheduler.cpp in Sources */,
+				04724A1615D3660400E769A7 /* Task.cpp in Sources */,
+				04724A1715D3660400E769A7 /* Thread.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
