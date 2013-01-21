@@ -29,7 +29,7 @@ public:
 	AKThreadState state() { return _state; }
 	void setState(AKThreadState state);
 	int id() { return _id; }
-	int priority() { return _priority; }
+	int priority();
 	void setPriority(int priority) { _priority = priority; }
 	AKMTTask* currentTask() { return _currentTask; }
 	std::list<AKThread*>& threadsWaiting() { return _threadsWaiting; }

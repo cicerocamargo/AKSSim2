@@ -39,40 +39,54 @@ int AKThread::currentTaskId() {
 	return _currentTask->id();
 }
 
+int AKThread::priority() {
+	return currentTaskId();
+}
+
 void AKThread::generateFullyStrictDCG(int width, int depth, int cost, bool isVariableCost) {
 	if (depth == 0) {
 		_tasks.push_back(new AKMTTask(GEN_COST(cost, isVariableCost), this));
 	} else {
-		AKMTTask* lastFork = 0;
-		AKMTTask* lastJoin = 0;
+		AKMTTask* previousTask = 0;
 		for (int i = 0; i < width; ++i) {
-			// generate the next level first
+			// create fork tasks, the next thread level, and connect them
 			AKThread* thread = new AKThread;
-			thread->generateFullyStrictDCG(width, depth-1, cost, isVariableCost);
-
-			// create fork and join tasks
 			AKMTTask* fork = new AKMTTask(GEN_COST(cost, isVariableCost), this);
-			AKMTTask* join = new AKMTTask(GEN_COST(cost, isVariableCost), this);
-			
-			// connect them
+			thread->generateFullyStrictDCG(width, depth-1, cost, isVariableCost);
 			fork->setForkedThread(thread);
-			join->setJoinedThread(thread);
-			if (lastFork && lastJoin) {
-				fork->addSuccessor(lastFork);
-				join->addPredecessor(lastJoin);
-				join->addPredecessor(lastJoin->joinedThread()->lastTask());
-			} else {
-				fork->addSuccessor(join);
-			}
 			fork->addSuccessor(thread->firstTask());
-			_tasks.push_front(fork);
-			_tasks.push_back(join);
-			lastFork = fork;
-			lastJoin = join;
+			if (previousTask) {
+				previousTask->addSuccessor(fork);
+			}
+			_tasks.push_back(fork);
+			previousTask = fork;
 		}
+
+		// create join tasks and connect them to the right forks
+		std::list<AKMTTask*> joinTasks;
+		std::list<AKMTTask*>::reverse_iterator it;
+		for (it = _tasks.rbegin(); it != _tasks.rend(); ++it) {
+			AKMTTask* join = new AKMTTask(GEN_COST(cost, isVariableCost), this);
+			join->setJoinedThread((*it)->forkedThread());
+			join->addPredecessor(previousTask);
+			if (previousTask->isJoin()) {
+				join->addPredecessor(previousTask->joinedThread()->lastTask());	
+			}
+			joinTasks.push_back(join);
+			previousTask = join;
+		}
+
+		// add join tasks to the task list
+		std::list<AKMTTask*>::iterator it2;
+		for (it2 = joinTasks.begin(); it2 != joinTasks.end(); ++it2) {
+			_tasks.push_back(*it2);
+		}
+
+		// create the last task and connect it to the last join
 		AKMTTask* __lastTask = new AKMTTask(GEN_COST(cost, isVariableCost), this);
-		__lastTask->addPredecessor(lastJoin);
-		__lastTask->addPredecessor(lastJoin->joinedThread()->lastTask());
+		__lastTask->addPredecessor(previousTask);
+		assert(previousTask->isJoin());
+		__lastTask->addPredecessor(previousTask->joinedThread()->lastTask());
 		_tasks.push_back(__lastTask);
 	}
 	_currentTask = _tasks.front();
