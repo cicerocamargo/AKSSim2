@@ -1,57 +1,40 @@
 #include "AKThread.h"
 #include "AKMTTask.h"
 #include "AKSchedulingPoint.h"
+#include "Defines.h"
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
 
-#define GEN_COST(c,v) v ? rand() % c + 1 : c
-
-// const char* AKThreadStateNames[] = {
-// 	"AKThreadStateDefault",
-// 	"AKThreadStateReady",
-// 	"AKThreadStateRunning",
-// 	"AKThreadStateBlocked",
-// 	"AKThreadStateFinished"
-// };
-
-const char* AKThreadStateNames[] = {
-	"Default",
-	"Ready",
-	"Running",
-	"Blocked",
-	"Finished"
-};
-
 int AKThread::instanceCounter = 0;
 
-AKThread::AKThread() {
+AKThread::AKThread() : AKSchedulingUnit() {
 	_id = instanceCounter++;
-	_priority = 0;
-	_state = AKThreadStateDefault;
 	_currentTask = NULL;
 }
 
-AKThread::~AKThread() {}
+AKThread::~AKThread() {
+	// TODO : oposite of AKThread::generateFullyStrictDCG
+}
 
 int AKThread::currentTaskId() {
 	assert(_currentTask != NULL);
 	return _currentTask->id();
 }
 
-int AKThread::priority() {
-	return currentTaskId();
+int AKThread::priority() { // TODO!!!!!!
+	return _currentTask->priority();
 }
 
 void AKThread::generateFullyStrictDCG(int width, int depth, int cost, bool isVariableCost) {
 	if (depth == 0) {
-		_tasks.push_back(new AKMTTask(GEN_COST(cost, isVariableCost), this));
+		_tasks.push_back(new AKMTTask(GEN_TASK_COST(cost, isVariableCost), this));
 	} else {
 		AKMTTask* previousTask = 0;
 		for (int i = 0; i < width; ++i) {
 			// create fork tasks, the next thread level, and connect them
 			AKThread* thread = new AKThread;
-			AKMTTask* fork = new AKMTTask(GEN_COST(cost, isVariableCost), this);
+			AKMTTask* fork = new AKMTTask(GEN_TASK_COST(cost, isVariableCost), this);
 			thread->generateFullyStrictDCG(width, depth-1, cost, isVariableCost);
 			fork->setForkedThread(thread);
 			fork->addSuccessor(thread->firstTask());
@@ -66,7 +49,7 @@ void AKThread::generateFullyStrictDCG(int width, int depth, int cost, bool isVar
 		std::list<AKMTTask*> joinTasks;
 		std::list<AKMTTask*>::reverse_iterator it;
 		for (it = _tasks.rbegin(); it != _tasks.rend(); ++it) {
-			AKMTTask* join = new AKMTTask(GEN_COST(cost, isVariableCost), this);
+			AKMTTask* join = new AKMTTask(GEN_TASK_COST(cost, isVariableCost), this);
 			join->setJoinedThread((*it)->forkedThread());
 			join->addPredecessor(previousTask);
 			if (previousTask->isJoin()) {
@@ -83,23 +66,29 @@ void AKThread::generateFullyStrictDCG(int width, int depth, int cost, bool isVar
 		}
 
 		// create the last task and connect it to the last join
-		AKMTTask* __lastTask = new AKMTTask(GEN_COST(cost, isVariableCost), this);
+		AKMTTask* __lastTask = new AKMTTask(GEN_TASK_COST(cost, isVariableCost), this);
 		__lastTask->addPredecessor(previousTask);
 		assert(previousTask->isJoin());
 		__lastTask->addPredecessor(previousTask->joinedThread()->lastTask());
 		_tasks.push_back(__lastTask);
 	}
-	_currentTask = _tasks.front();
+	_currentTask = firstTask();
+}
+
+void AKThread::calculatePriorityAttributes() {
+	assert(this->isRoot());
+	this->firstTask()->level();
+	this->lastTask()->coLevel();
 }
 
 AKSchedulingPoint* AKThread::runStep() {
-	assert(_state == AKThreadStateRunning);
+	assert(_state == AKSchedulingUnitStateRunning);
 	assert(_currentTask != NULL);
 	AKSchedulingPoint* sp = _currentTask->runStep();
 	if (sp) {
 		_currentTask = (AKMTTask*)_currentTask->continuation();
 		if (!_currentTask) {
-			_state = AKThreadStateFinished;
+			_state = AKSchedulingUnitStateFinished;
 		}
 	}
 	return sp;
@@ -118,19 +107,11 @@ AKMTTask* AKThread::lastTask() {
 }
 
 const char* AKThread::stateString() {
-	return AKThreadStateNames[_state];	
+	return AKSchedulingUnitStateNames[_state];	
 }
 
 void AKThread::addThreadWaiting(AKThread* blockedThread) {
 	_threadsWaiting.push_back(blockedThread);
-}
-
-void AKThread::setState(AKThreadState state) {
-	if (state == AKThreadStateReady) {
-		assert(_currentTask);
-		_currentTask->setState(AKTaskStateReady);
-	}
-	_state = state;
 }
 
 std::list<AKThread*> AKThread::forkedThreads() {
@@ -143,14 +124,15 @@ std::list<AKThread*> AKThread::forkedThreads() {
 	return _forkedThreads;	
 }
 
-bool AKThread::validate() {
+bool AKThread::validateSchedule() {
 	// validate my own state
-	if (_state != AKThreadStateFinished) {
+	/*if (_state != AKSchedulingUnitStateFinished) {
 		return false;
-	}
+	}*/
+
 	// validate my tasks' state
 	for (taskIt = _tasks.begin(); taskIt != _tasks.end(); ++taskIt) {
-		if ((*taskIt)->state() != AKTaskStateFinished) {
+		if ((*taskIt)->state() != AKSchedulingUnitStateFinished) {
 			return false;
 		}
 	}
@@ -158,7 +140,7 @@ bool AKThread::validate() {
 	std::list<AKThread*> _forkedThreads = this->forkedThreads();
 	std::list<AKThread*>::iterator threadIt;
 	for (threadIt = _forkedThreads.begin(); threadIt != _forkedThreads.end(); ++threadIt) {
-		if ((*threadIt)->validate() == false) {
+		if ((*threadIt)->validateSchedule() == false) {
 			return false;
 		}
 	}
@@ -174,6 +156,7 @@ void AKThread::print() {
 	std::cout << "\tThread " << _id << ": (" << this->stateString() << ")\n";
 	for (taskIt = _tasks.begin(); taskIt != _tasks.end(); ++taskIt) {
 		(*taskIt)->print();
+		std::cout << std::endl;
 	}
 	std::cout << "\n";
 	if (_tasks.size() > 1) {
@@ -182,5 +165,20 @@ void AKThread::print() {
 				(*taskIt)->forkedThread()->print();
 			}
 		}
+	}
+}
+
+void AKThread::prepareForSimulation() {
+	_currentTask = firstTask();
+	if (this->isRoot()) {
+		_state = AKSchedulingUnitStateReady;
+		_currentTask->prepareForSimulation();
+	} else {
+		_state = AKSchedulingUnitStateDefault;
+	}
+	std::list<AKThread*> _forkedThreads = this->forkedThreads();
+	std::list<AKThread*>::iterator threadIt;
+	FOR_EACH(threadIt, _forkedThreads) {
+		(*threadIt)->prepareForSimulation();
 	}
 }

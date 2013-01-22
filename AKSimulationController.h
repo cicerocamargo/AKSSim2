@@ -1,26 +1,26 @@
 #include <list>
+#include "AKSimulationParameters.h"
 using namespace std;
 
-struct AKSimulationParameters;
 class AKThread;
-class AKThreadProcessor;
-class AKThreadScheduler;
+class AKProcessor;
+class AKScheduler;
 
 class AKSimulationController {
-	bool _isInteractive;
-	bool _detailedHistory;
+	AKSimulationParameters _simulationParameters;
 	AKThread* _rootThread;
-	AKThreadScheduler* _scheduler;
-	list<AKThreadProcessor*> _processors;
-	list<AKThreadProcessor*>::iterator proc;
+	AKScheduler* _scheduler;
+	list<AKProcessor*> _processors;
+	list<AKProcessor*>::iterator proc;
 
 	bool endOfProgram();
 	void printProcessorsHistory();
+	void runSimulationsAtTaskLevel();
+	void runSimulationsAtThreadLevel();
+	int runSimulation();
 	AKSimulationController() {}
 public:
 	AKSimulationController(AKSimulationParameters parameters);
 	~AKSimulationController();
-	int runSimulation();
-
-	/* data */
+	void startSimulations();
 };

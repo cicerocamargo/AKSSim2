@@ -13,11 +13,6 @@ AKMTTask::AKMTTask(int cost, AKThread* thread) : AKTask(cost) {
 	_joinedThread = 0;
 }
 
-// AKMTTask::~AKMTTask() {
-
-// }
-
-
 void AKMTTask::setForkedThread(AKThread* thread) {
 	assert(_joinedThread == NULL);
 	_forkedThread = thread;
@@ -40,13 +35,13 @@ AKTask* AKMTTask::continuation() {
 
 AKSchedulingPoint* AKMTTask::runStep() {
 	if (_stepsRemaining == -1) {
-		assert(_state == AKTaskStateReady);
+		assert(_state == AKSchedulingUnitStateReady);
 		_stepsRemaining = _cost;
-		_state = AKTaskStateRunning;
+		_state = AKSchedulingUnitStateRunning;
 	}
 	_stepsRemaining--;
 	if (_stepsRemaining == 0) {
-		_state = AKTaskStateFinished;
+		_state = AKSchedulingUnitStateFinished;
 		this->updateSuccessors();
 		if (this->isFork()) {
 			AKTask* cont = this->continuation();
@@ -62,13 +57,10 @@ AKSchedulingPoint* AKMTTask::runStep() {
 }
 
 void AKMTTask::print() {
-	std::cout << "\t\tTask " << _id << " (costs " << _cost;
+	AKTask::print();
 	if (this->isFork()) {
-		std::cout << "; forks Thread " << _forkedThread->id();
+		std::cout << " --> forks Thread " << _forkedThread->id();
 	} else if (this->isJoin()) {
-		std::cout << "; joins Thread " << _joinedThread->id(); 
+		std::cout << " <-- joins Thread " << _joinedThread->id(); 
 	}
-	std::cout << "; pred: "; printSet(_predecessors);
-	std::cout << "; succ: "; printSet(_successors);
-	std::cout << "; state: " << this->stateString() << ");\n";
 }

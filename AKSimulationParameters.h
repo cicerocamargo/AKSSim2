@@ -1,8 +1,11 @@
+#ifndef AKSIMULATIONPARAMETERS_H
+#define AKSIMULATIONPARAMETERS_H
+
 #include <iostream>
 #include <cassert>
 
 struct AKSimulationParameters {
-public:	
+
 	int processors;
 	int width;
 	int depth;
@@ -22,13 +25,14 @@ public:
 	}
 
 	void print() {
-		std::cout << processors << " processors";
+		std::cout << std::endl << processors << " processors";
 		std::cout << "\nwidth = " << width;
 		std::cout << "\ndepth = " << depth;
 		std::cout << "\naverage task cost = " << cost;
 		std::cout << "\nvariable cost? " << (isVariableCost ? "Yes" : "No");
 		std::cout << "\ninteractive? " << (interactiveSimulation ? "Yes" : "No");
-		std::cout << "\nshow detailed history? " << (detailedHistory ? "Yes" : "No") << std::endl;
+		std::cout << "\nshow detailed history? " << (detailedHistory ? "Yes" : "No");
+		std::cout << std::endl << std::endl;
 	}
 
 	void validate() {
@@ -37,3 +41,5 @@ public:
 		assert(cost > 0);
 	}
 };
+
+#endif

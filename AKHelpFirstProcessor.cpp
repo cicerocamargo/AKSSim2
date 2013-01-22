@@ -1,6 +1,6 @@
 #include "AKHelpFirstProcessor.h"
 #include "AKSchedulingPoint.h"
-#include "AKThreadScheduler.h"
+#include "AKScheduler.h"
 #include "AKThread.h"
 #include <iostream>
 
@@ -11,30 +11,30 @@ void AKHelpFirstProcessor::commitSchedulingPoint() {
 	if (_schedulingPoint) {
 		switch(_schedulingPoint->event) {
 			case AKSchedulingEventThreadForked:
-				_schedulingPoint->relatedThread->setState(AKThreadStateReady);
-				_scheduler->putJob(_schedulingPoint->relatedThread);
+				_schedulingPoint->relatedThread->setState(AKSchedulingUnitStateReady);
+				_scheduler->putJob((AKSchedulingUnit*)_schedulingPoint->relatedThread);
 				break;
 			case AKSchedulingEventThreadJoined:
-				if (_schedulingPoint->relatedThread->state() != AKThreadStateFinished) {
-					_currentThread->setState(AKThreadStateBlocked);
-					_schedulingPoint->relatedThread->addThreadWaiting(_currentThread);
+				if (_schedulingPoint->relatedThread->state() != AKSchedulingUnitStateFinished) {
+					currentThread()->setState(AKSchedulingUnitStateBlocked);
+					_schedulingPoint->relatedThread->addThreadWaiting(currentThread());
 					if (!_migrationEnabled) {
-						_blockedThreads.push(_currentThread);
+						_blockedThreads.push(currentThread());
 					}
-					_currentThread = NULL;
+					setCurrentThread(NULL);
 				}
 				break;
 			case AKSchedulingEventThreadCompleted: {
-				std::list<AKThread*>& threadsToUnblock = _currentThread->threadsWaiting();
+				std::list<AKThread*>& threadsToUnblock = currentThread()->threadsWaiting();
 				std::list<AKThread*>::iterator it;
 				for (it = threadsToUnblock.begin(); it != threadsToUnblock.end(); ++it) {
-					(*it)->setState(AKThreadStateReady);
+					(*it)->setState(AKSchedulingUnitStateReady);
 					if (_migrationEnabled) {
 						_scheduler->putJob(*it);
 					}
 				}
 				threadsToUnblock.clear();
-				_currentThread = NULL;
+				setCurrentThread(NULL);
 				break;
 			}	
 			default:
@@ -50,17 +50,17 @@ void AKHelpFirstProcessor::commitSchedulingPoint() {
 void AKHelpFirstProcessor::getJob() {
 	if (_blockedThreads.size() > 0) {
 		AKThread* t = _blockedThreads.top();
-		if (t->state() == AKThreadStateReady) {
-			_currentThread = t;
+		if (t->state() == AKSchedulingUnitStateReady) {
+			setCurrentThread(t);
 			_blockedThreads.pop();
 		}	
 	}
 
-	if (!_currentThread) {
-		_currentThread = _scheduler->getJob();
+	if (!currentThread()) {
+		setCurrentThread((AKThread*)_scheduler->getJob());
 	}
 
-	if (_currentThread) {
-		_currentThread->setState(AKThreadStateRunning);
+	if (currentThread()) {
+		currentThread()->setState(AKSchedulingUnitStateRunning);
 	}
 }

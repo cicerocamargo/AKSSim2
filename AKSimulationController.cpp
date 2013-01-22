@@ -1,27 +1,29 @@
-#include "AKSimulationParameters.h"
 #include "AKSimulationController.h"
 #include "AKThread.h"
-//#include "AKThreadProcessor.h"
-#include "AKHelpFirstProcessor.h"
+#include "AKMTTask.h"
+//#include "AKProcessor.h"
+//#include "AKHelpFirstProcessor.h"
 //#include "AKWorkFirstProcessor.h"
-#include "AKThreadScheduler.h"
+#include "AKTaskProcessor.h"
+#include "AKScheduler.h"
+#include "Defines.h"
 #include <iostream>
 #include <cstdio>
 #include <cassert>
 
-AKSimulationController::AKSimulationController(AKSimulationParameters params) {
-	_isInteractive = params.interactiveSimulation;
-	_detailedHistory = params.detailedHistory;
-	_scheduler = new AKThreadScheduler;
-	for (int i = 0; i < params.processors; ++i) {
-		_scheduler->addProcessor((AKThreadProcessor*)new AKHelpFirstProcessor(false));
-	}
-	_processors = _scheduler->processors();
+AKSimulationController::AKSimulationController(AKSimulationParameters params) : _simulationParameters(params) {
+	 
+	_scheduler = new AKScheduler;	
 	_rootThread = new AKThread;
-	_rootThread->generateFullyStrictDCG(params.width, params.depth, params.cost, params.isVariableCost);
-	_scheduler->setRootThread(_rootThread);
+	_rootThread->generateFullyStrictDCG(_simulationParameters.width,
+										_simulationParameters.depth,
+										_simulationParameters.cost,
+										_simulationParameters.isVariableCost);
+
+	_rootThread->calculatePriorityAttributes();
 	_rootThread->print();
-	if (_isInteractive) {
+
+	if (_simulationParameters.interactiveSimulation) {
 		getchar();
 	}
 }
@@ -29,8 +31,8 @@ AKSimulationController::AKSimulationController(AKSimulationParameters params) {
 AKSimulationController::~AKSimulationController() {}
 
 bool AKSimulationController::endOfProgram() {
-	for (proc = _processors.begin(); proc != _processors.end(); proc++) {
-		if (!(*proc)->isIdle()) {
+	FOR_EACH (proc, _processors) {
+		if ( (*proc)->isBusy() ) {
 			return false;
 		}
 	}	
@@ -40,41 +42,50 @@ bool AKSimulationController::endOfProgram() {
 void AKSimulationController::printProcessorsHistory() {
 	std::cout << "History:\n";
 	int i = 0;
-	for (proc = _processors.begin(); proc != _processors.end(); proc++, i++) {
-		if (_detailedHistory) {
-			std::cout << "  Processor " << i << ":\t"
-					  << (_isInteractive ? (*proc)->history() : (*proc)->finalHistory()) << std::endl;
+	FOR_EACH (proc, _processors) {
+		if (_simulationParameters.detailedHistory) {
+			std::cout << "  Processor " << i << ":\t";
+			if (_simulationParameters.interactiveSimulation) {
+				std::cout << (*proc)->history();
+			} else {
+				std::cout << (*proc)->finalHistory();
+			}
+			std::cout << std::endl;
 		} else {
 			std::cout << "  Processor " << i << ":\t" << (*proc)->activity() << std::endl;
 		}
-	}	
+		++i;
+	}
+	std::cout << "\n";	
 }
 
 int AKSimulationController::runSimulation() {
 	int makespan = 0;
 
-	while (true) {
+	FOR_EVER {
 
-		for (proc = _processors.begin(); proc != _processors.end(); proc++) {
+		FOR_EACH (proc, _processors) {
 			(*proc)->runStep();
 		}
 
 		if ( endOfProgram() ) {
-			if (_rootThread->validate() == false) {
+			if (_rootThread->validateSchedule() == false) {
 				std::cerr << "Error: some tasks weren't executed!\n";
 				return -1;
 			} else {
-				if (!_isInteractive) { printProcessorsHistory(); }
+				#ifdef DEBUG
+				if (!_simulationParameters.interactiveSimulation) { printProcessorsHistory(); }
+				#endif
 				return makespan;
 			}
 		}
 		makespan++;
 
-		for (proc = _processors.begin(); proc != _processors.end(); proc++) {
+		FOR_EACH (proc, _processors) {
 			(*proc)->commitSchedulingPoint();
 		}
 
-		if (_isInteractive) {
+		if (_simulationParameters.interactiveSimulation) {
 			std::system("clear");
 			_rootThread->print();
 			printProcessorsHistory();
@@ -82,3 +93,28 @@ int AKSimulationController::runSimulation() {
 		}
 	}
 }
+
+void AKSimulationController::runSimulationsAtTaskLevel() {
+	for (int i = 0; i < _simulationParameters.processors; ++i) {
+		_processors.push_back((AKProcessor*)new AKTaskProcessor);
+	}
+
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevel);
+	_scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
+	std::cout << "HLFET: " << runSimulation() << " u. t.\n";
+
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevel);
+	_scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
+	std::cout << "SCFET: " << runSimulation() << " u. t.\n";
+}
+
+void AKSimulationController::runSimulationsAtThreadLevel() {
+
+}
+
+void AKSimulationController::startSimulations() {
+	assert(_rootThread && _rootThread->isRoot());
+	runSimulationsAtTaskLevel();
+	runSimulationsAtThreadLevel();
+}
+

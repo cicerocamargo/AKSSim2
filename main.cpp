@@ -13,9 +13,9 @@ int main(int argc, char** argv) {
 
 	AKSimulationParameters params = parseParameters(argc, argv);
 	params.validate();
+	
 	AKSimulationController simulationController(params);
-	int makespan = simulationController.runSimulation();
-	printf("makespan = %d\n", makespan);
+	simulationController.startSimulations();
 
 	return 0;
 }

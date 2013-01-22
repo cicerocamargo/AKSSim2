@@ -1,43 +1,48 @@
 #include <set>
+#include "AKSchedulingUnit.h"
 
 class AKThread;
 
 typedef enum {
-	AKTaskStateDefault,
-	AKTaskStateReady,
-	AKTaskStateRunning,
-	AKTaskStateFinished
-} AKTaskState;
+	AKTaskPriorityAttributeLevel,
+	AKTaskPriorityAttributeCoLevel,
+	AKTaskPriorityAttributeDynamicLevel
+} AKTaskPriorityAttribute;
 
-class AKTask {
+class AKTask : public AKSchedulingUnit {
 
 protected:
-	int _id;
 	int _cost;
-	int _priority;
+	int _level;
 	int _coLevel;
 	int _stepsRemaining;
-	AKTaskState _state;
 	std::set<AKTask*> _predecessors;
 	std::set<AKTask*> _successors;
 	std::set<AKTask*>::iterator it;
 
 	void tryGettingReady();
+	static AKTaskPriorityAttribute priorityAttribute;
 public:
 	AKTask(int cost=0);
 	~AKTask();
+	static void setPriorityAttribute(AKTaskPriorityAttribute attr);
 
-	int id() { return _id; }
 	int cost() { return _cost; }
-	int priority() { return _priority; }
-	void setPriority(int priority) { _priority = priority; }
-	AKTaskState state() { return _state; }
-	void setState(AKTaskState state) { _state = state; }
-	std::set<AKTask*>& predecessors() { return _predecessors; }
-	std::set<AKTask*>& successors() { return _successors; }
-	virtual AKThread* thread() { return 0; }
-	virtual AKTask* continuation() { return 0; }
+	int stepsRemaining() { return _stepsRemaining; }
+	std::set<AKTask*> predecessors() { return _predecessors; }
+	std::set<AKTask*> successors() { return _successors; }
+	virtual AKThread* thread() = 0;
+	virtual AKTask* continuation() = 0;
+	virtual void print();
+	virtual void prepareForSimulation();
 
+	int level();
+	int coLevel();
+	bool isInputTask();
+	bool isOutputTask();
+	virtual bool isRoot() { return isInputTask(); }
+	virtual int priority();
+	void calculateLevels();
 	void addSuccessor(AKTask* task);
 	void addPredecessor(AKTask* task);	
 	void updateSuccessors(); // only called after '_state = AKTaskStateFinished'
