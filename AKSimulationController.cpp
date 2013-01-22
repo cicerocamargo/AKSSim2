@@ -1,10 +1,8 @@
 #include "AKSimulationController.h"
 #include "AKThread.h"
 #include "AKMTTask.h"
-//#include "AKProcessor.h"
-//#include "AKHelpFirstProcessor.h"
-//#include "AKWorkFirstProcessor.h"
-#include "AKTaskProcessor.h"
+#include "AKProcessor.h"
+#include "AKArchitectureBuilder.h"
 #include "AKScheduler.h"
 #include "Defines.h"
 #include <iostream>
@@ -95,17 +93,15 @@ int AKSimulationController::runSimulation() {
 }
 
 void AKSimulationController::runSimulationsAtTaskLevel() {
-	for (int i = 0; i < _simulationParameters.processors; ++i) {
-		_processors.push_back((AKProcessor*)new AKTaskProcessor);
-	}
+	_processors = AKArchitectureBuilder::buildTaskProcessors(_simulationParameters.processors);
 
 	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevel);
 	_scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
 	std::cout << "HLFET: " << runSimulation() << " u. t.\n";
 
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevel);
-	_scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
-	std::cout << "SCFET: " << runSimulation() << " u. t.\n";
+	// AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevel);
+	// _scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
+	// std::cout << "SCFET: " << runSimulation() << " u. t.\n";
 }
 
 void AKSimulationController::runSimulationsAtThreadLevel() {

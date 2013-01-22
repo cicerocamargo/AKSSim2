@@ -1,3 +1,6 @@
+#ifndef AKTHREADPROCESSOR_H
+#define AKTHREADPROCESSOR_H
+
 #include "AKProcessor.h"
 
 class AKThread;
@@ -10,3 +13,5 @@ public:
 	AKThread* currentThread();
 	void setCurrentThread(AKThread* thread);
 };
+
+#endif

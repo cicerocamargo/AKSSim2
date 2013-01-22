@@ -1,3 +1,6 @@
+#ifndef AKPROCESSOR_H
+#define AKPROCESSOR_H
+
 #include <string>
 
 class AKScheduler;
@@ -26,3 +29,5 @@ public:
 	bool isBusy() { return !isIdle(); }
 	void prepareForSimulation();
 };
+
+#endif
