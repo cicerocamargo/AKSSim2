@@ -4,9 +4,12 @@
 #include "Defines.h"
 
 const char* AKTaskPriorityAttributeNames[] = {
-	"Level",
-	"Co-Level",
-	"Dynamic Level"
+	"LevelWithEstimatedTimes",
+	"CoLevelWithEstimatedTimes",
+	"LevelWithNonEstimatedTimes",
+	"CoLevelWithNonEstimatedTimes",
+	"Random",
+	"DynamicLevel"
 };
 
 
@@ -117,6 +120,8 @@ int AKTask::priority() {
 			return this->levelNET();
 		case AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes:
 			return this->coLevelNET();
+		case AKTaskPriorityAttributeRandom:
+			return rand();
 		default:
 			std::cout << "Warning: unhandled priority attribute!\n";
 			return 0;

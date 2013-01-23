@@ -8,6 +8,7 @@ typedef enum {
 	AKTaskPriorityAttributeCoLevelWithEstimatedTimes,
 	AKTaskPriorityAttributeLevelWithNonEstimatedTimes,
 	AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes,
+	AKTaskPriorityAttributeRandom,
 	AKTaskPriorityAttributeDynamicLevel
 } AKTaskPriorityAttribute;
 

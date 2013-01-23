@@ -3,7 +3,6 @@
 #include <cstdio>
 #include <ctime>
 
-#include "AKSimulationParameters.h"
 #include "AKSimulationController.h"
 
 AKSimulationParameters parseParameters(int argc, char **argv);
@@ -30,7 +29,7 @@ AKSimulationParameters parseParameters(int argc, char **argv) {
 	AKSimulationParameters params;
 	opterr = 0;
 
-	while ( (c = getopt (argc, argv, "p:w:d:c:ivh")) != -1) {
+	while ( (c = getopt (argc, argv, "p:w:d:c:ivgG")) != -1) {
 		switch (c) {
 			case 'c':
 				params.cost = atoi(optarg);
@@ -47,11 +46,14 @@ AKSimulationParameters parseParameters(int argc, char **argv) {
 			case 'v':
 				params.isVariableCost = true;
 				break;
-			case 'h':
-				params.detailedHistory = true;
-				break;
 			case 'i':
 				params.interactiveSimulation = true;
+				break;
+			case 'g':
+				params.chartType = AKGanttChartTypeContracted;
+				break;
+			case 'G':
+				params.chartType = AKGanttChartTypeExpanded;
 				break;
 			case '?':
 				if (optopt == 'p' || optopt == 'c' || optopt == 'w' || optopt == 'd'){

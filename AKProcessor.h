@@ -20,9 +20,8 @@ public:
 	AKProcessor();
 	~AKProcessor();
 	void setScheduler(AKScheduler* scheduler) { _scheduler = scheduler; }
-	std::string history() { return _history; }
-	std::string activity() { return _activity; }
-	std::string finalHistory();
+	std::string history();
+	std::string activity();
 	virtual void runStep() = 0;
 	virtual void commitSchedulingPoint() = 0;
 	bool isIdle();

@@ -9,9 +9,15 @@ AKProcessor::AKProcessor() {
 
 AKProcessor::~AKProcessor() {}
 
-std::string AKProcessor::finalHistory() { // TODO
+// remove last step
+std::string AKProcessor::history() {
 	unsigned pos = _history.find_last_of(";");
   	return _history.substr(0, pos);
+}
+
+// remove last step
+std::string AKProcessor::activity() {
+  	return _activity.substr(0, _activity.size()-1);
 }
 
 bool AKProcessor::isIdle() {

@@ -19,8 +19,8 @@ AKSimulationController::AKSimulationController(AKSimulationParameters params) : 
 										_simulationParameters.isVariableCost);
 
 	_rootThread->calculatePriorityAttributes();
-	_rootThread->print();
 
+	_rootThread->print();
 	if (_simulationParameters.interactiveSimulation) {
 		getchar();
 	}
@@ -38,19 +38,13 @@ bool AKSimulationController::endOfProgram() {
 }
 
 void AKSimulationController::printProcessorsHistory() {
-	std::cout << "History:\n";
+	std::cout << "\n GanntChart:\n";
 	int i = 0;
 	FOR_EACH (proc, _processors) {
-		if (_simulationParameters.detailedHistory) {
-			std::cout << "  Processor " << i << ":\t";
-			if (_simulationParameters.interactiveSimulation) {
-				std::cout << (*proc)->history();
-			} else {
-				std::cout << (*proc)->finalHistory();
-			}
-			std::cout << std::endl;
+		if (_simulationParameters.chartType == AKGanttChartTypeExpanded) {
+			std::cout << "   Processor " << i << ":\t" << (*proc)->history() << std::endl;
 		} else {
-			std::cout << "  Processor " << i << ":\t" << (*proc)->activity() << std::endl;
+			std::cout << "   Processor " << i << ":\t" << (*proc)->activity() << std::endl;
 		}
 		++i;
 	}
@@ -71,9 +65,6 @@ int AKSimulationController::runSimulation() {
 				std::cerr << "Error: some tasks weren't executed!\n";
 				return -1;
 			} else {
-				#ifdef DEBUG
-				if (!_simulationParameters.interactiveSimulation) { printProcessorsHistory(); }
-				#endif
 				return makespan;
 			}
 		}
@@ -98,19 +89,38 @@ void AKSimulationController::runSimulationsAtTaskLevel() {
 
 	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevelWithEstimatedTimes);
 	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "HLFET: " << runSimulation() << " u. t.\n\n";
+	std::cout << "\nHLFET: " << runSimulation() << " u. t.\n";
+	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
+		printProcessorsHistory();
+	}
 
 	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevelWithEstimatedTimes);
 	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "SCFET: " << runSimulation() << " u. t.\n\n";
+	std::cout << "\nSCFET: " << runSimulation() << " u. t.\n";
+	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
+		printProcessorsHistory();
+	}
 
 	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevelWithNonEstimatedTimes);
 	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "HLFNET: " << runSimulation() << " u. t.\n\n";
+	std::cout << "\nHLFNET: " << runSimulation() << " u. t.\n";
+	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
+		printProcessorsHistory();
+	}
 
 	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes);
 	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "SCFNET: " << runSimulation() << " u. t.\n\n";
+	std::cout << "\nSCFNET: " << runSimulation() << " u. t.\n";
+	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
+		printProcessorsHistory();
+	}
+
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeRandom);
+	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+	std::cout << "\nRANDOM: " << runSimulation() << " u. t.\n";
+	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
+		printProcessorsHistory();
+	}
 }
 
 void AKSimulationController::runSimulationsAtThreadLevel() {
