@@ -10,7 +10,6 @@ const char* AKSchedulingUnit::AKSchedulingUnitStateNames[] = {
 
 AKSchedulingUnit::AKSchedulingUnit() {
 	int _id = -1;
-	_sentToScheduler = false;
 	_state = AKSchedulingUnitStateDefault;
 }
 

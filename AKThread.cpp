@@ -77,8 +77,10 @@ void AKThread::generateFullyStrictDCG(int width, int depth, int cost, bool isVar
 
 void AKThread::calculatePriorityAttributes() {
 	assert(this->isRoot());
-	this->firstTask()->level();
-	this->lastTask()->coLevel();
+	this->firstTask()->levelET();
+	this->lastTask()->coLevelET();
+	this->firstTask()->levelNET();
+	this->lastTask()->coLevelNET();
 }
 
 AKSchedulingPoint* AKThread::runStep() {

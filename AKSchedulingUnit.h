@@ -29,6 +29,7 @@ public:
 	void setState(AKSchedulingUnitState state) { _state = state; }
 	virtual int priority() = 0;
 	virtual bool isRoot() = 0;
+	virtual bool validateSchedule() = 0;
 	virtual AKSchedulingPoint* runStep() = 0;
 	virtual void prepareForSimulation() = 0;
 };

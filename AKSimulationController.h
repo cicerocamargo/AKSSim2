@@ -5,10 +5,12 @@ using namespace std;
 class AKThread;
 class AKProcessor;
 class AKScheduler;
+class AKSchedulingUnit;
 
 class AKSimulationController {
 	AKSimulationParameters _simulationParameters;
 	AKThread* _rootThread;
+	AKSchedulingUnit* _rootSchedulingUnit;
 	AKScheduler* _scheduler;
 	list<AKProcessor*> _processors;
 	list<AKProcessor*>::iterator proc;

@@ -4,8 +4,10 @@
 class AKThread;
 
 typedef enum {
-	AKTaskPriorityAttributeLevel,
-	AKTaskPriorityAttributeCoLevel,
+	AKTaskPriorityAttributeLevelWithEstimatedTimes,
+	AKTaskPriorityAttributeCoLevelWithEstimatedTimes,
+	AKTaskPriorityAttributeLevelWithNonEstimatedTimes,
+	AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes,
 	AKTaskPriorityAttributeDynamicLevel
 } AKTaskPriorityAttribute;
 
@@ -13,8 +15,10 @@ class AKTask : public AKSchedulingUnit {
 
 protected:
 	int _cost;
-	int _level;
-	int _coLevel;
+	int _levelET;
+	int _coLevelET;
+	int _levelNET;
+	int _coLevelNET;
 	int _stepsRemaining;
 	std::set<AKTask*> _predecessors;
 	std::set<AKTask*> _successors;
@@ -33,11 +37,14 @@ public:
 	std::set<AKTask*> successors() { return _successors; }
 	virtual AKThread* thread() = 0;
 	virtual AKTask* continuation() = 0;
+	virtual bool validateSchedule();
 	virtual void print();
 	virtual void prepareForSimulation();
 
-	int level();
-	int coLevel();
+	int levelET();
+	int coLevelET();
+	int levelNET();
+	int coLevelNET();
 	bool isInputTask();
 	bool isOutputTask();
 	virtual bool isRoot() { return isInputTask(); }

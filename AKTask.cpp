@@ -14,11 +14,13 @@ const char* nameFromPriorityAttribute(AKTaskPriorityAttribute value) {
 	return AKTaskPriorityAttributeNames[value];
 }
 
-AKTaskPriorityAttribute AKTask::priorityAttribute = AKTaskPriorityAttributeLevel;
+AKTaskPriorityAttribute AKTask::priorityAttribute = AKTaskPriorityAttributeLevelWithEstimatedTimes;
 
 AKTask::AKTask(int cost) : AKSchedulingUnit(), _cost(cost) {
-	_level = 0;
-	_coLevel = 0;
+	_levelET=0;
+	_coLevelET=0;
+	_levelNET=0;
+	_coLevelNET=0;
 	_stepsRemaining = -1;
 }
 
@@ -35,8 +37,8 @@ void AKTask::print() {
 	std::cout << "\t\tTask " << _id << " (costs " << _cost;
 	std::cout << "; pred: "; printSet(_predecessors);
 	std::cout << "; succ: "; printSet(_successors);
-	std::cout << "; level: " << this->level();
-	std::cout << "; co-level: " << this->coLevel();
+	std::cout << "; level: " << this->levelET();
+	std::cout << "; co-level: " << this->coLevelET();
 	std::cout << "; state: " << AKSchedulingUnit::getNameFromState(_state) << ")";
 }
 
@@ -48,46 +50,73 @@ bool AKTask::isOutputTask() {
 	return _successors.empty();
 }
 
-int AKTask::level() {
-	if (_level == 0) { // calculate !
-#ifdef DEBUG
-		std::cout << "Calculating level for task " << _id << "...\n";
-#endif
+int AKTask::levelET() {
+	if (_levelET == 0) { // calculate !
 		if (this->isOutputTask()) {
-			_level = -_cost;
+			_levelET = -_cost;
 		} else {
 			for (it = _successors.begin(); it != _successors.end(); ++it) {
-				_level = MIN(_level, (*it)->level());
+				_levelET = MIN(_levelET, (*it)->levelET());
 			}
-			_level -= _cost;
+			_levelET -= _cost;
 		}
 	}
-	return _level;
+	return _levelET;
 }
 
-int AKTask::coLevel() {
-		if (_coLevel == 0) { // calculate !
-#ifdef DEBUG
-		std::cout << "Calculating coLevel for task " << _id << "...\n";
-#endif
+int AKTask::coLevelET() {
+	if (_coLevelET == 0) { // calculate !
 		if (this->isInputTask()) {
-			_coLevel = _cost;
+			_coLevelET = _cost;
 		} else {
 			for (it = _predecessors.begin(); it != _predecessors.end(); ++it) {
-				_coLevel = MAX(_coLevel, (*it)->coLevel());
+				_coLevelET = MAX(_coLevelET, (*it)->coLevelET());
 			}
-			_coLevel += _cost;
+			_coLevelET += _cost;
 		}
 	}
-	return _coLevel;
+	return _coLevelET;
 }
+
+int AKTask::levelNET() {
+	if (_levelNET == 0) { // calculate !
+		if (this->isOutputTask()) {
+			_levelNET = -1;
+		} else {
+			for (it = _successors.begin(); it != _successors.end(); ++it) {
+				_levelNET = MIN(_levelNET, (*it)->levelNET());
+			}
+			_levelNET -= 1;
+		}
+	}
+	return _levelNET;
+}
+
+int AKTask::coLevelNET() {
+	if (_coLevelNET == 0) { // calculate !
+		if (this->isInputTask()) {
+			_coLevelNET = 1;
+		} else {
+			for (it = _predecessors.begin(); it != _predecessors.end(); ++it) {
+				_coLevelNET = MAX(_coLevelNET, (*it)->coLevelNET());
+			}
+			_coLevelNET += 1;
+		}
+	}
+	return _coLevelNET;
+}
+
 
 int AKTask::priority() {
 	switch(priorityAttribute) {
-		case AKTaskPriorityAttributeLevel:
-			return this->level();
-		case AKTaskPriorityAttributeCoLevel:
-			return this->coLevel();
+		case AKTaskPriorityAttributeLevelWithEstimatedTimes:
+			return this->levelET();
+		case AKTaskPriorityAttributeCoLevelWithEstimatedTimes:
+			return this->coLevelET();
+		case AKTaskPriorityAttributeLevelWithNonEstimatedTimes:
+			return this->levelNET();
+		case AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes:
+			return this->coLevelNET();
 		default:
 			std::cout << "Warning: unhandled priority attribute!\n";
 			return 0;
@@ -132,9 +161,22 @@ void AKTask::printSet(std::set<AKTask*>& aSet) {
 }
 
 void AKTask::prepareForSimulation() {
+	_sentToScheduler = false;
 	_stepsRemaining = -1;
 	_state = this->isInputTask() ? AKSchedulingUnitStateReady : AKSchedulingUnitStateDefault;
 	FOR_EACH(it, _successors) {
 		(*it)->prepareForSimulation();
 	}	
+}
+
+bool AKTask::validateSchedule() {
+	if (_state != AKSchedulingUnitStateFinished) {
+		return false;
+	}
+	FOR_EACH(it, _successors) {
+		if (!(*it)->validateSchedule()) {
+			return false;
+		}
+	}
+	return true;
 }

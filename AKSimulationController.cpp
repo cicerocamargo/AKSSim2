@@ -10,7 +10,7 @@
 #include <cassert>
 
 AKSimulationController::AKSimulationController(AKSimulationParameters params) : _simulationParameters(params) {
-	 
+	_rootSchedulingUnit = 0; 
 	_scheduler = new AKScheduler;	
 	_rootThread = new AKThread;
 	_rootThread->generateFullyStrictDCG(_simulationParameters.width,
@@ -67,7 +67,7 @@ int AKSimulationController::runSimulation() {
 		}
 
 		if ( endOfProgram() ) {
-			if (_rootThread->validateSchedule() == false) {
+			if (_rootSchedulingUnit->validateSchedule() == false) {
 				std::cerr << "Error: some tasks weren't executed!\n";
 				return -1;
 			} else {
@@ -94,14 +94,23 @@ int AKSimulationController::runSimulation() {
 
 void AKSimulationController::runSimulationsAtTaskLevel() {
 	_processors = AKArchitectureBuilder::buildTaskProcessors(_simulationParameters.processors);
+	_rootSchedulingUnit = _rootThread->firstTask();
 
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevel);
-	_scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
-	std::cout << "HLFET: " << runSimulation() << " u. t.\n";
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevelWithEstimatedTimes);
+	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+	std::cout << "HLFET: " << runSimulation() << " u. t.\n\n";
 
-	// AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevel);
-	// _scheduler->prepareForSimulation(_processors, _rootThread->firstTask());
-	// std::cout << "SCFET: " << runSimulation() << " u. t.\n";
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevelWithEstimatedTimes);
+	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+	std::cout << "SCFET: " << runSimulation() << " u. t.\n\n";
+
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevelWithNonEstimatedTimes);
+	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+	std::cout << "HLFNET: " << runSimulation() << " u. t.\n\n";
+
+	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes);
+	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+	std::cout << "SCFNET: " << runSimulation() << " u. t.\n\n";
 }
 
 void AKSimulationController::runSimulationsAtThreadLevel() {
