@@ -13,6 +13,7 @@ class AKSchedulingPoint;
 
 class AKSchedulingUnit {
 protected:
+	unsigned _arrivalNumber;
 	int _id;
 	AKSchedulingUnitState _state;
 	bool _sentToScheduler;
@@ -26,6 +27,9 @@ public:
 	bool sentToScheduler() { return _sentToScheduler; }
 	void setSentToScheduler() { _sentToScheduler = true; }
 	AKSchedulingUnitState state() { return _state; }
+	unsigned arrivalNumber() { return _arrivalNumber; }
+	void setArrivalNumber(unsigned number) { _arrivalNumber = number; }
+	
 	void setState(AKSchedulingUnitState state) { _state = state; }
 	virtual int priority() = 0;
 	virtual bool isRoot() = 0;

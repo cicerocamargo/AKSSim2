@@ -1,4 +1,4 @@
-CPPFLAGS = -03 -DDEBUG -g
+CPPFLAGS = -O3 -DDEBUG -g
 	
 CPPSOURCES = $(wildcard *.cpp)
     

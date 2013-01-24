@@ -3,10 +3,9 @@
 #include "AKScheduler.h"
 #include "AKThread.h"
 #include <iostream>
+#include <cstdlib>
 
-AKWorkFirstProcessor::AKWorkFirstProcessor() : AKThreadProcessor() {
-
-}
+AKWorkFirstProcessor::AKWorkFirstProcessor() : AKThreadProcessor() {}
 
 void AKWorkFirstProcessor::commitSchedulingPoint() {
 	if (_schedulingPoint) {

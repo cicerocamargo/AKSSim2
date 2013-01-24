@@ -3,8 +3,19 @@
 
 class AKMTTask;
 
+typedef enum {
+	AKThreadPriorityAttributeStaticCoLevelWithEstimatedTimes,
+	AKThreadPriorityAttributeStaticCoLevelWithNonEstimatedTimes,
+	AKThreadPriorityAttributeDynamicCoLevelWithEstimatedTimes,
+	AKThreadPriorityAttributeDynamicCoLevelWithNonEstimatedTimes,
+	AKThreadPriorityAttributeSequentialOrder,
+	AKThreadPriorityAttributeRandom,
+	AKThreadPriorityAttributeArrivalOrder
+} AKThreadPriorityAttribute;
+
 class AKThread : public AKSchedulingUnit {
 	static int instanceCounter;
+	static AKThreadPriorityAttribute priorityAttribute;
 
 	std::list<AKMTTask*> _tasks;
 	AKMTTask* _currentTask;
@@ -14,6 +25,10 @@ public:
 	AKThread();
 	~AKThread();
 	
+	static void setPriorityAttribute(AKThreadPriorityAttribute attr);
+	static std::list<AKThreadPriorityAttribute> listWithPrioriyAttributes();
+	static const char* algorithmNameFromPriorityAttribute(AKThreadPriorityAttribute attr);
+
 	std::list<AKMTTask*>& tasks() { return _tasks; }
 	virtual int priority();
 	AKMTTask* currentTask() { return _currentTask; }

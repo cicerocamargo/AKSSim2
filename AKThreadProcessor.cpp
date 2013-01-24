@@ -1,5 +1,6 @@
 #include "AKThreadProcessor.h"
 #include "AKThread.h"
+#include <cstdio>
 
 // AKThreadProcessor::AKThreadProcessor() : AKProcessor() {}
 

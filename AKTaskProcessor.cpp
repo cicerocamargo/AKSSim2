@@ -4,6 +4,7 @@
 #include "AKTask.h"
 #include "Defines.h"
 #include <set>
+#include <cstdio>
 
 AKTaskProcessor::AKTaskProcessor() {
 

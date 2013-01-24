@@ -1,23 +1,34 @@
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
 #include "AKTask.h"
 #include "Defines.h"
 
-const char* AKTaskPriorityAttributeNames[] = {
-	"LevelWithEstimatedTimes",
-	"CoLevelWithEstimatedTimes",
-	"LevelWithNonEstimatedTimes",
-	"CoLevelWithNonEstimatedTimes",
-	"Random",
-	"DynamicLevel"
+const char* AKTaskAlgorithmNames[] = {
+	"           HLFET",
+	"          HLFNET",
+	"           SCFET",
+	"          SCFNET",
+	"          Random",
+	"             DLS"
 };
 
+AKTaskPriorityAttribute AKTask::priorityAttribute = AKTaskPriorityAttributeLevelWithEstimatedTimes;
 
-const char* nameFromPriorityAttribute(AKTaskPriorityAttribute value) {
-	return AKTaskPriorityAttributeNames[value];
+std::list<AKTaskPriorityAttribute> AKTask::listWithPrioriyAttributes() {
+	std::list<AKTaskPriorityAttribute> l;
+	l.push_back(AKTaskPriorityAttributeLevelWithEstimatedTimes);
+	l.push_back(AKTaskPriorityAttributeCoLevelWithEstimatedTimes);
+	l.push_back(AKTaskPriorityAttributeLevelWithNonEstimatedTimes);
+	l.push_back(AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes);
+	l.push_back(AKTaskPriorityAttributeRandom);
+	//l.pushBack(AKTaskPriorityAttributeDynamicLevel);
+	return l;
 }
 
-AKTaskPriorityAttribute AKTask::priorityAttribute = AKTaskPriorityAttributeLevelWithEstimatedTimes;
+const char* AKTask::algorithmNameFromPriorityAttribute(AKTaskPriorityAttribute attr) {
+	return AKTaskAlgorithmNames[attr];
+}
 
 AKTask::AKTask(int cost) : AKSchedulingUnit(), _cost(cost) {
 	_levelET=0;
@@ -166,6 +177,7 @@ void AKTask::printSet(std::set<AKTask*>& aSet) {
 }
 
 void AKTask::prepareForSimulation() {
+	_arrivalNumber = -1;
 	_sentToScheduler = false;
 	_stepsRemaining = -1;
 	_state = this->isInputTask() ? AKSchedulingUnitStateReady : AKSchedulingUnitStateDefault;

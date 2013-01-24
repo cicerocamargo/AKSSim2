@@ -1,12 +1,13 @@
 #include <set>
+#include <list>
 #include "AKSchedulingUnit.h"
 
 class AKThread;
 
 typedef enum {
 	AKTaskPriorityAttributeLevelWithEstimatedTimes,
-	AKTaskPriorityAttributeCoLevelWithEstimatedTimes,
 	AKTaskPriorityAttributeLevelWithNonEstimatedTimes,
+	AKTaskPriorityAttributeCoLevelWithEstimatedTimes,
 	AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes,
 	AKTaskPriorityAttributeRandom,
 	AKTaskPriorityAttributeDynamicLevel
@@ -30,7 +31,10 @@ protected:
 public:
 	AKTask(int cost=0);
 	~AKTask();
+	
 	static void setPriorityAttribute(AKTaskPriorityAttribute attr);
+	static std::list<AKTaskPriorityAttribute> listWithPrioriyAttributes();
+	static const char* algorithmNameFromPriorityAttribute(AKTaskPriorityAttribute attr);
 
 	int cost() { return _cost; }
 	int stepsRemaining() { return _stepsRemaining; }

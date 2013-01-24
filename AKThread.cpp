@@ -7,6 +7,18 @@
 #include <iostream>
 
 int AKThread::instanceCounter = 0;
+AKThreadPriorityAttribute AKThread::priorityAttribute = AKThreadPriorityAttributeRandom;
+
+const char* AKThreadAlgorithmNames[] = {
+	"    Static SCFET",
+	"   Static SCFNET",
+	"   Dynamic SCFET",
+	"  Dynamic SCFNET",
+	"Sequential Order",
+	"          Random",
+	"   Arrival Order"
+};
+
 
 AKThread::AKThread() : AKSchedulingUnit() {
 	_id = instanceCounter++;
@@ -22,8 +34,47 @@ int AKThread::currentTaskId() {
 	return _currentTask->id();
 }
 
-int AKThread::priority() { // TODO!!!!!!
-	return _currentTask->priority();
+int AKThread::priority() {
+	switch(AKThread::priorityAttribute) {
+		case AKThreadPriorityAttributeStaticCoLevelWithEstimatedTimes:
+			return firstTask()->coLevelET();
+		case AKThreadPriorityAttributeStaticCoLevelWithNonEstimatedTimes:
+			return firstTask()->coLevelNET();
+		case AKThreadPriorityAttributeDynamicCoLevelWithEstimatedTimes:
+			return _currentTask->coLevelET();
+		case AKThreadPriorityAttributeDynamicCoLevelWithNonEstimatedTimes:
+			return _currentTask->coLevelNET();
+		case AKThreadPriorityAttributeSequentialOrder:
+			return currentTaskId();
+		case AKThreadPriorityAttributeRandom:
+			return rand();
+		case AKThreadPriorityAttributeArrivalOrder:
+			return _arrivalNumber;
+		default:
+			std::cout << "Unhandled thread priority attribute!" << std::endl;
+			return 0;
+	}
+}
+
+void AKThread::setPriorityAttribute(AKThreadPriorityAttribute attr) {
+	priorityAttribute = attr;
+}
+
+std::list<AKThreadPriorityAttribute> AKThread::listWithPrioriyAttributes() {
+	std::list<AKThreadPriorityAttribute> l;
+
+	l.push_back(AKThreadPriorityAttributeStaticCoLevelWithEstimatedTimes);
+	l.push_back(AKThreadPriorityAttributeStaticCoLevelWithNonEstimatedTimes);
+	l.push_back(AKThreadPriorityAttributeDynamicCoLevelWithEstimatedTimes);
+	l.push_back(AKThreadPriorityAttributeDynamicCoLevelWithNonEstimatedTimes);
+	l.push_back(AKThreadPriorityAttributeSequentialOrder);
+	l.push_back(AKThreadPriorityAttributeRandom);
+	l.push_back(AKThreadPriorityAttributeArrivalOrder);
+
+	return l;
+}
+const char* AKThread::algorithmNameFromPriorityAttribute(AKThreadPriorityAttribute attr) {
+	return AKThreadAlgorithmNames[attr];
 }
 
 void AKThread::generateFullyStrictDCG(int width, int depth, int cost, bool isVariableCost) {
@@ -171,6 +222,7 @@ void AKThread::print() {
 }
 
 void AKThread::prepareForSimulation() {
+	_arrivalNumber = -1;
 	_currentTask = firstTask();
 	if (this->isRoot()) {
 		_state = AKSchedulingUnitStateReady;

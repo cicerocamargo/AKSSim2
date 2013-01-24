@@ -8,20 +8,21 @@
 #include <iostream>
 #include <cstdio>
 #include <cassert>
+#include <cstdlib>
 
-AKSimulationController::AKSimulationController(AKSimulationParameters params) : _simulationParameters(params) {
+AKSimulationController::AKSimulationController(AKSimulationParameters params) : _params(params) {
 	_rootSchedulingUnit = 0; 
 	_scheduler = new AKScheduler;	
 	_rootThread = new AKThread;
-	_rootThread->generateFullyStrictDCG(_simulationParameters.width,
-										_simulationParameters.depth,
-										_simulationParameters.cost,
-										_simulationParameters.isVariableCost);
+	_rootThread->generateFullyStrictDCG(_params.width,
+										_params.depth,
+										_params.cost,
+										_params.isVariableCost);
 
 	_rootThread->calculatePriorityAttributes();
 
 	_rootThread->print();
-	if (_simulationParameters.interactiveSimulation) {
+	if (_params.interactiveSimulation) {
 		getchar();
 	}
 }
@@ -41,14 +42,16 @@ void AKSimulationController::printProcessorsHistory() {
 	std::cout << "\n GanntChart:\n";
 	int i = 0;
 	FOR_EACH (proc, _processors) {
-		if (_simulationParameters.chartType == AKGanttChartTypeExpanded) {
-			std::cout << "   Processor " << i << ":\t" << (*proc)->history() << std::endl;
+		char str[5];
+		sprintf(str, "%02d", i);
+		if (_params.chartType == AKGanttChartTypeExpanded) {
+			std::cout << "   Processor " << str << ": " << (*proc)->history() << std::endl;
 		} else {
-			std::cout << "   Processor " << i << ":\t" << (*proc)->activity() << std::endl;
+			std::cout << "   Processor " << str << ": " << (*proc)->activity() << std::endl;
 		}
 		++i;
 	}
-	std::cout << "\n";	
+	std::cout << "\n\n";	
 }
 
 int AKSimulationController::runSimulation() {
@@ -74,8 +77,8 @@ int AKSimulationController::runSimulation() {
 			(*proc)->commitSchedulingPoint();
 		}
 
-		if (_simulationParameters.interactiveSimulation) {
-			std::system("clear");
+		if (_params.interactiveSimulation) {
+			int rc = std::system("clear");
 			_rootThread->print();
 			printProcessorsHistory();
 			getchar();
@@ -84,47 +87,33 @@ int AKSimulationController::runSimulation() {
 }
 
 void AKSimulationController::runSimulationsAtTaskLevel() {
-	_processors = AKArchitectureBuilder::buildTaskProcessors(_simulationParameters.processors);
+	std::cout << "\nCurrent architecture: Basic Task  Processors\n\n";
+
+	_processors = AKArchitectureBuilder::buildTaskProcessors(_params.processors);
 	_rootSchedulingUnit = _rootThread->firstTask();
+	std::list<AKTaskPriorityAttribute> attributes = AKTask::listWithPrioriyAttributes();
+	std::list<AKTaskPriorityAttribute>::iterator attr;
 
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevelWithEstimatedTimes);
-	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "\nHLFET: " << runSimulation() << " u. t.\n";
-	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
-		printProcessorsHistory();
-	}
-
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevelWithEstimatedTimes);
-	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "\nSCFET: " << runSimulation() << " u. t.\n";
-	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
-		printProcessorsHistory();
-	}
-
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeLevelWithNonEstimatedTimes);
-	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "\nHLFNET: " << runSimulation() << " u. t.\n";
-	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
-		printProcessorsHistory();
-	}
-
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeCoLevelWithNonEstimatedTimes);
-	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "\nSCFNET: " << runSimulation() << " u. t.\n";
-	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
-		printProcessorsHistory();
-	}
-
-	AKTask::setPriorityAttribute(AKTaskPriorityAttributeRandom);
-	_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
-	std::cout << "\nRANDOM: " << runSimulation() << " u. t.\n";
-	if (_simulationParameters.chartType != AKGanttChartTypeNone && _simulationParameters.interactiveSimulation == false) {
-		printProcessorsHistory();
+	FOR_EACH(attr, attributes) {
+		AKTask::setPriorityAttribute(*attr);
+		_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+		std::cout << AKTask::algorithmNameFromPriorityAttribute(*attr)
+				  << ": " << runSimulation() << " u. t.\n";
+		if (_params.chartType != AKGanttChartTypeNone && _params.interactiveSimulation == false) {
+			printProcessorsHistory();
+		}	
 	}
 }
 
 void AKSimulationController::runSimulationsAtThreadLevel() {
-
+	_rootSchedulingUnit = _rootThread;
+	
+	_processors = AKArchitectureBuilder::buildWorkFirstProcessors(_params.processors);
+	runMultithreadedSimulations("Work First Processors");
+	_processors = AKArchitectureBuilder::buildHelpFirstProcessorsWithMigration(_params.processors);
+	runMultithreadedSimulations("Help First Processors (migration enabled)");
+	_processors = AKArchitectureBuilder::buildHelpFirstProcessorsWithoutMigration(_params.processors);
+	runMultithreadedSimulations("Help First Processors (no migration)");
 }
 
 void AKSimulationController::startSimulations() {
@@ -133,3 +122,20 @@ void AKSimulationController::startSimulations() {
 	runSimulationsAtThreadLevel();
 }
 
+void AKSimulationController::runMultithreadedSimulations(const char* architectureName) {
+	std::cout << "\nCurrent architecture: " << architectureName << "\n\n";
+
+	std::list<AKThreadPriorityAttribute> attributes = AKThread::listWithPrioriyAttributes();
+	std::list<AKThreadPriorityAttribute>::iterator attr;
+
+	FOR_EACH(attr, attributes) {
+		AKThread::setPriorityAttribute(*attr);
+		_scheduler->prepareForSimulation(_processors, _rootSchedulingUnit);
+		std::cout << AKThread::algorithmNameFromPriorityAttribute(*attr)
+				  << ": " << runSimulation() << " u. t.\n";
+		if (_params.chartType != AKGanttChartTypeNone && _params.interactiveSimulation == false) {
+			printProcessorsHistory();
+		}	
+	}	
+
+}

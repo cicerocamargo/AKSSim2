@@ -3,6 +3,7 @@
 #include "AKScheduler.h"
 #include "AKThread.h"
 #include <iostream>
+#include <cstdlib>
 
 AKHelpFirstProcessor::AKHelpFirstProcessor(bool migrationEnabled)
 : AKThreadProcessor(), _migrationEnabled(migrationEnabled) {}

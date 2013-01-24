@@ -10,6 +10,7 @@ class AKSchedulingPoint {
 	AKSchedulingPoint() {}
 	AKSchedulingPoint(AKThread* relatedThread, AKSchedulingEvent event);
 public:
+	unsigned _arrivalNumber;
 	AKThread* relatedThread;
 	AKSchedulingEvent event;
 
