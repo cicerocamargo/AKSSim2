@@ -16,7 +16,7 @@ const char* AKThreadAlgorithmNames[] = {
 	"  Dynamic SCFNET",
 	"Sequential Order",
 	"          Random",
-	"   Arrival Order"
+	"            FCFS"
 };
 
 
@@ -45,7 +45,7 @@ int AKThread::priority() {
 		case AKThreadPriorityAttributeDynamicCoLevelWithNonEstimatedTimes:
 			return _currentTask->coLevelNET();
 		case AKThreadPriorityAttributeSequentialOrder:
-			return currentTaskId();
+			return _id;
 		case AKThreadPriorityAttributeRandom:
 			return rand();
 		case AKThreadPriorityAttributeArrivalOrder:

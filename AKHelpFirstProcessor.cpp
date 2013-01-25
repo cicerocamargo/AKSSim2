@@ -31,6 +31,7 @@ void AKHelpFirstProcessor::commitSchedulingPoint() {
 				for (it = threadsToUnblock.begin(); it != threadsToUnblock.end(); ++it) {
 					(*it)->setState(AKSchedulingUnitStateReady);
 					if (_migrationEnabled) {
+						(*it)->setArrivalNumber(-1);
 						_scheduler->putJob(*it);
 					}
 				}

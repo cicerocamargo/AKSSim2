@@ -28,6 +28,7 @@ void AKWorkFirstProcessor::commitSchedulingPoint() {
 				std::list<AKThread*>::iterator it;
 				for (it = threadsToUnblock.begin(); it != threadsToUnblock.end(); ++it) {
 					(*it)->setState(AKSchedulingUnitStateReady);
+					(*it)->setArrivalNumber(-1);
 					_scheduler->putJob(*it);
 				}
 				threadsToUnblock.clear();
